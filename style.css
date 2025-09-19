@@ -1,0 +1,259 @@
+:root{
+  --accent:#ef850b;
+  --muted:#6b7280;
+  --bg:#f7f7fb;
+  --card:#ffffff;
+  --max:1100px;
+  --radius:12px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  color:#111827;
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Container */
+.container{
+  width:calc(100% - 32px);
+  max-width:var(--max);
+  margin:0 auto;
+  padding:24px 0;
+}
+
+/* Header */
+.site-header{
+  background:#fff;
+  border-bottom:1px solid #eee;
+  position:sticky;
+  top:0;
+  z-index:999;
+}
+.header-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{height:42px;width:auto;display:block}
+.logo.small{height:32px}
+
+/* Nav */
+.nav.desktop{display:flex;align-items:center;gap:14px}
+.nav.desktop a{color:var(--muted);text-decoration:none;padding:8px 10px;border-radius:6px}
+.nav.desktop a.cta{background:var(--accent);color:#fff}
+.nav.mobile{display:none}
+
+/* Hamburger */
+.hamburger{display:none;background:transparent;border:0;cursor:pointer;padding:6px}
+.hamburger span{display:block;width:22px;height:3px;background:#333;margin:4px 0;border-radius:2px}
+
+/* Hero */
+.hero{padding:56px 0;background:linear-gradient(180deg,#e9ab69,#f6fbff)}
+.hero-grid{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center}
+.hero-text h1{font-size:2rem;margin:0 0 8px}
+.lead{color:var(--muted);margin:0 0 14px}
+.hero-media img{width:100%;border-radius:12px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.06)}
+
+/* Buttons */
+.btn{display:inline-block;border:0;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600;text-decoration:none;color:inherit}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.outline{background:transparent;border:2px solid var(--accent);color:var(--accent)}
+
+/* Sections */
+.section{padding:36px 0 48px}
+.section.alt{background:#fff}
+.section h2{margin:0 0 8px;text-align:center}
+.section-sub{color:var(--muted);margin-bottom:18px;text-align:center}
+
+/* Grids */
+.services-grid,.project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.service-card,.card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 8px 20px rgba(16,24,40,0.04)}
+.card img{width:100%;height:170px;object-fit:cover;border-radius:8px}
+
+/* Contact */
+.contact-grid{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
+.lead-form{background:#fff;padding:16px;border-radius:12px;box-shadow:0 10px 40px rgba(2,6,23,0.04)}
+.lead-form label{display:block;margin-bottom:12px;color:#111827;font-size:0.95rem}
+.lead-form input, .lead-form textarea, .lead-form select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;margin-top:6px;font-size:0.95rem}
+.form-row{display:flex;gap:10px}
+.contact-info{background:#fff;padding:16px;border-radius:12px}
+
+/* Footer */
+.site-footer {
+  background: #f6f6f6;
+  color: #000306;
+  padding: 40px 0 20px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 28px;
+}
+
+.footer-col h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #070000;
+  margin-bottom: 12px;
+}
+
+.footer-col p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.footer-col nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer-col nav a {
+  color: #000000;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.footer-col nav a:hover {
+  color: var(--accent);
+}
+
+.social-links {
+  display: flex;
+  gap: 12px;
+}
+
+.social-links a {
+  font-size: 1.4rem;
+  color: #000307;
+  transition: color 0.2s ease;
+}
+
+.social-links a:hover {
+  color: var(--accent);
+}
+
+.footer-bottom {
+  margin-top: 30px;
+  padding-top: 16px;
+  border-top: 1px solid #000306;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #00040a;
+}
+
+.footer-bottom p {
+  margin: 4px 0;
+}
+
+
+/* Feedback */
+.feedback{margin-top:12px;color:var(--muted);font-size:0.95rem}
+
+/* Responsive rules */
+@media (max-width:1100px){
+  .hero-grid{grid-template-columns:1fr 350px}
+}
+@media (max-width:980px){
+  .hero-grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .nav.desktop{display:none}
+  .hamburger{display:block}
+}
+@media (max-width:600px){
+  .container{padding:16px}
+  .hero{padding:28px 0}
+  .hero-text h1{font-size:1.5rem}
+  .project-grid,.services-grid{grid-template-columns:1fr}
+  .nav.mobile{display:none} /* will be toggled via JS when active */
+}
+
+
+/* ===== POPUP CONTACT FORM ===== */
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none; /* hidden by default */
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.popup-box {
+  background: #fff;
+  padding: 28px;
+  border-radius: 8px;
+  max-width: 420px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.popup-box h2 {
+  margin-bottom: 16px;
+  text-align: center;
+  color: #e9900c;
+}
+
+.popup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.popup-form input,
+.popup-form textarea,
+.popup-form button {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.popup-form button {
+  background: #ea7f04;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.popup-form button:hover {
+  background: #004999;
+}
+
+.popup-close {
+  position: absolute;
+  top: 10px; right: 12px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.popup-feedback {
+  margin-top: 10px;
+  text-align: center;
+  color: green;
+  font-size: 0.9rem;
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
