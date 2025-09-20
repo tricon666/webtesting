@@ -27,26 +27,30 @@
       <span></span>
     </div>
 
-      <!-- Desktop nav -->
-      <nav class="nav desktop" role="navigation" aria-label="Main navigation">
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#services">Services</a>
-        <a href="#projects">Projects</a>
-         <a href="#offer">Offers</a>
-        <a href="#contact" class="cta">Contact</a>
-      </nav>
-
-      <!-- Mobile Navigation -->
-    <nav class="nav mobile" id="mobileNav">
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#services">Services</a>
-      <a href="#projects">Projects</a>
-      <a href="#Offers">Offers</a>
-      <a href="#contact" class="cta">Contact</a>
+    <!-- Navigation -->
+    <nav class="nav desktop">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#projects" class="nav-link">Projects</a>
+      <a href="#contact" class="nav-link cta">Contact</a>
     </nav>
-    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="nav mobile" id="mobileNav">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#projects" class="nav-link">Projects</a>
+      <a href="#contact" class="nav-link ">Contact</a>
+    </nav>
+    <!-- PNG Menu Button -->
+<button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+  <img id="iconHamburger" src="menu.png" alt="Menu" width="28" height="28">
+  <img id="iconClose" src="arrow.png" alt="Close" width="26" height="26" style="display:none;">
+</button>
+
+  </div>
   </header>
 
   <main>
@@ -56,10 +60,10 @@
     <button class="popup-close" id="popupClose">&times;</button>
     <h2>Get in Touch</h2>
     <form id="popupForm" class="popup-form">
-      <input type="text" placeholder="Your Name" required />
-      <input type="email" placeholder="Your Email" required />
-      <input type="tel" placeholder="Your Phone" required />
-      <textarea placeholder="Your Message" rows="4" required></textarea>
+      <input type="text" placeholder="Name" required />
+      <input type="email" placeholder="Email" required />
+      <input type="tel" placeholder="Phone" required />
+      <textarea placeholder="Message" rows="4" required></textarea>
       <button type="submit">Send Message</button>
     </form>
     <p id="popupFeedback" class="popup-feedback"></p>
@@ -133,9 +137,9 @@
         </article>
 
         <article class="card">
-          <img src="assets/indiworks.jpg" alt="VJ Indiworks Kharadi" />
+          <img src="no3.jpg" alt="VJ Indiworks Kharadi" />
           <div class="card-body">
-            <h3>VJ Indiworks (Kharadi)</h3>
+            <h3> (Beed)</h3>
             <p>Smart office spaces with integrated retail options.</p>
           </div>
         </article>
@@ -154,7 +158,7 @@
      <!-- ABOUT -->
     <section id="about" class="section alt">
       <div class="container">
-        <h2>About Us</h2>
+         <h2>About Us</h2>
         <p class="section-sub">Building trust, delivering value.</p>
         <p>
           At <strong>Meghraj Heights</strong>, designed by <strong>Pujari Consultant &amp; Vastu Interior</strong>, we deliver modern, vastu-aligned homes with premium finishes, earthquake-resistant construction, and thoughtful utilities to create safe and elegant living spaces.
@@ -172,7 +176,7 @@
           <form id="leadForm" class="lead-form" novalidate>
             <label>
               Full name
-              <input type="text" name="name" id="name" required placeholder="Your name" />
+              <input type="text" name="name" id="name" required placeholder="name" />
             </label>
             <label>
               Phone
@@ -211,8 +215,21 @@
             <h3>Office Address</h3>
             <p>Pinpargavhan Road Beed, Maharashtra, India</p>
             <p><strong>Phone:</strong> +91 8855091561,7776930145</p>
-            <p><strong>Email:</strong> </p>
+            <p><strong>Email:</strong> vasundharadevelopers05@gmail.com </p>
+            <div class="contact-map">
+      <!-- Replace src with your map embed URL -->
+      <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3772.50332573762!2d75.74343987466328!3d18.997530154432347!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc52b006b9b8bd3%3A0x2d664c96ebcc8721!2sVasundhara%20developers!5e0!3m2!1sen!2sin!4v1758383654698!5m2!1sen!2sin" 
+        width="100%" 
+        height="350" 
+        style="border: 10px;; border-radius: 8px;" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
           </aside>
+
         </div>
       </div>
     </section>
@@ -255,7 +272,7 @@
       <h3>Follow Us</h3>
       <div class="social-links">
         <a href="" aria-label="Facebook">🌐</a>
-        <a href="https://www.instagram.com/vasundhara_developers_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" aria-label="Instagram">📸</a>
+        <a href="https://www.instagram.com/vasundhara_developers_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" aria-label="Instagram"> <img src="arrow.png" alt="logo" class="logo small" /></a>
         <a href="#" aria-label="LinkedIn">💼</a>
         <a href="#" aria-label="YouTube">▶️</a>
       </div>
