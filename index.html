@@ -4,31 +4,55 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Vasundhara Developers</title>
-  <meta name="description" content="Vilas Javdekar - Festive Season launches: VJ Palladio, PBC 2, Indiworks, Yashwin Enchante." />
+  <meta name="description" content="Vasundhara Developers - Festive Season launches: Palladio, PBC 2, Indiworks, Yashwin Enchante." />
+  <meta name="theme-color" content="#1e88e5" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Baloo+Bhai&display=swap" rel="stylesheet">
+  <meta property="og:title" content="Vasundhara Developers" />
+  <meta property="og:description" content="Festive Season launches and special offers on residential & commercial projects in Beed." />
+  <meta property="og:image" content="logo.png.png" />
+  <link rel="canonical" href="https://example.com/" />
   <link rel="stylesheet" href="style.css" />
-  <!-- Google Fonts: Poppins -->
-<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhai&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" sizes="32x32" href="logo.png.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="logo.png.png">
+
+  <!-- Organization JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Vasundhara Developers",
+    "url": "https://example.com/",
+    "logo": "https://example.com/logo.png.png",
+    "contactPoint": [{
+      "@type": "ContactPoint",
+      "telephone": "+91 8855091561",
+      "contactType": "customer service",
+      "areaServed": "IN"
+    }]
+  }
+  </script>
 
 
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <!-- HEADER -->
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="#home" aria-label="Home">
-        <img src="logo.png.png" alt="Vilas Javdekar Logo" class="logo" />
+        <img src="logo.png.png" alt="Vasundhara Developers logo" class="logo" />
       </a>
 
       <!-- Hamburger Button -->
-    <div class="hamburger" id="hamburger">
+    <div class="hamburger" id="hamburger" role="button" tabindex="0" aria-controls="mobileNav" aria-expanded="false" aria-label="Toggle navigation">
       <span></span>
       <span></span>
       <span></span>
     </div>
 
     <!-- Navigation -->
-    <nav class="nav desktop">
+  <nav class="nav desktop" role="navigation" aria-label="Primary">
       <a href="#home" class="nav-link">Home</a>
       <a href="#about" class="nav-link">About</a>
       <a href="#services" class="nav-link">Services</a>
@@ -37,7 +61,7 @@
     </nav>
 
     <!-- Mobile Nav -->
-    <nav class="nav mobile" id="mobileNav">
+  <nav class="nav mobile" id="mobileNav" role="navigation" aria-label="Mobile" aria-hidden="true">
       <a href="#home" class="nav-link">Home</a>
       <a href="#about" class="nav-link">About</a>
       <a href="#services" class="nav-link">Services</a>
@@ -46,24 +70,24 @@
     </nav>
     <!-- PNG Menu Button -->
 <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-  <img id="iconHamburger" src="menu.png" alt="Menu" width="28" height="28">
-  <img id="iconClose" src="arrow.png" alt="Close" width="26" height="26" style="display:none;">
+  <img id="iconHamburger" src="menu.png" alt="Menu icon" width="28" height="28">
+  <img id="iconClose" src="arrow.png" alt="Close icon" width="26" height="26" style="display:none;">
 </button>
 
   </div>
   </header>
 
-  <main>
+  <main id="main-content">
     <!-- POPUP CONTACT FORM -->
 <div id="popupOverlay" class="popup-overlay">
-  <div class="popup-box">
-    <button class="popup-close" id="popupClose">&times;</button>
+    <div class="popup-box">
+    <button class="popup-close" id="popupClose" aria-label="Close popup">&times;</button>
     <h2>Get in Touch</h2>
     <form id="popupForm" class="popup-form">
-      <input type="text" placeholder="Name" required />
-      <input type="email" placeholder="Email" required />
-      <input type="tel" placeholder="Phone" required />
-      <textarea placeholder="Message" rows="4" required></textarea>
+      <input type="text" name="popup_name" id="popup_name" placeholder="Name" required />
+      <input type="email" name="popup_email" id="popup_email" placeholder="Email" required />
+      <input type="tel" name="popup_phone" id="popup_phone" placeholder="Phone" required />
+      <textarea name="popup_message" id="popup_message" placeholder="Message" rows="4" required></textarea>
       <button type="submit">Send Message</button>
     </form>
     <p id="popupFeedback" class="popup-feedback"></p>
@@ -78,12 +102,50 @@
           <p class="lead">Special offers on residential & commercial Beed.</p>
           <div class="hero-actions">
             <a href="#contact" class="btn primary">Enquire Now</a>
-            <a id="downloadBrochure" class="btn outline" href="bbc.pdf" download>Download Brochure</a>
+            <button id="downloadBrochure" class="btn outline">Download Brochure</button>
           </div>
         </div>
         <div class="hero-media">
-          <img src="ms01.jpg" alt="Festive Season Launch" />
+          <img src="ms01.jpg" alt="Festive Season Launch" loading="lazy" />
         </div>
+      </div>
+    </section>
+
+    <!-- EXCITING OFFERS -->
+    <section id="offers" class="section container offers-section">
+      <h2>Exciting Offers</h2>
+      <p class="section-sub">Limited-time festive offers across select projects — grab them while they last.</p>
+
+      <div class="offers-grid">
+        <article class="offer-card">
+          <div class="badge">Hot</div>
+          <h3>Palladio Early-Bird</h3>
+          <p>Special pricing for first 20 bookings. Flexible payment plans available.</p>
+          <div class="offer-actions">
+            <a class="btn primary" href="#contact">Enquire</a>
+            <button class="btn outline" id="offerBrochure1">Download Brochure</button>
+          </div>
+        </article>
+
+        <article class="offer-card">
+          <div class="badge">New</div>
+          <h3>PBC 2 Launch Offer</h3>
+          <p>Zero stamp duty for a limited period on selected units.</p>
+          <div class="offer-actions">
+            <a class="btn primary" href="#contact">Book Visit</a>
+            <button class="btn outline" id="offerBrochure2">Download Brochure</button>
+          </div>
+        </article>
+
+        <article class="offer-card">
+          <div class="badge">Save</div>
+          <h3>Indiworks Business Pack</h3>
+          <p>Free fit-outs for early commercial bookings — enquire now.</p>
+          <div class="offer-actions">
+            <a class="btn primary" href="#contact">Get Offer</a>
+            <button class="btn outline" id="offerBrochure3">Download Brochure</button>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -116,43 +178,57 @@
 
     <!-- PROJECTS -->
     <section id="projects" class="container section">
-      <h2>Previous Projects</h2>
-      <p class="section-sub">Featured Previous projects.</p>
+      <h2>Our Projects</h2>
+      <p class="section-sub">Selected residential & commercial projects by Vasundhara Developers.</p>
 
-      <div class="project-grid">
-        <article class="card">
-          <img src="big.jpeg" alt="VJ Palladio Baner NX" />
-          <div class="card-body">
-            <h3>Meghraj Heights Beed</h3>
-            <p>2 BHK XL homes with terrace gardens.</p>
+      <div class="project-slider-wrapper">
+        <button class="slider-btn prev" aria-label="Previous project">◀</button>
+        <div class="project-slider">
+          <div class="slider-track">
+        <article class="project-card">
+          <div class="media">
+            <img src="big.jpeg" alt="Meghraj Heights" loading="lazy" />
+          </div>
+          <div class="info">
+            <h3>Meghraj Heights, Beed</h3>
+            <p>2 BHK XL homes with terrace gardens and premium finishes.</p>
           </div>
         </article>
 
-        <article class="card">
-          <img src="self.jpg" alt="VJ PBC 2 Balewadi" />
-          <div class="card-body">
-            <h3>Vasundhara developers</h3>
-            <p>Spacious 3 & 4+ BHK Banglow in Beed.</p>
+        <article class="project-card">
+          <div class="media">
+            <img src="self.jpg" alt="Vasundhara developers - Bungalow" loading="lazy" />
+          </div>
+          <div class="info">
+            <h3>Vasundhara Homes</h3>
+            <p>Spacious 3 & 4+ BHK bungalows designed for family living.</p>
           </div>
         </article>
 
-        <article class="card">
-          <img src="no3.jpg" alt="VJ Indiworks Kharadi" />
-          <div class="card-body">
-            <h3> (Beed)</h3>
-            <p>Smart office spaces with integrated retail options.</p>
+        <article class="project-card">
+          <div class="media">
+            <img src="no3.jpg" alt="Smart Office Spaces" loading="lazy" />
+          </div>
+          <div class="info">
+            <h3>Commercial Spaces</h3>
+            <p>Smart office spaces with integrated retail options and flexible layouts.</p>
           </div>
         </article>
 
-        <article class="card">
-          <img src="assets/yashwin.jpg" alt="VJ Yashwin Enchante Upper Kharadi" />
-          <div class="card-body">
-            <h3>VJ Yashwin Enchante</h3>
-            <p>2 & 3 BHK homes focused on lifestyle & leisure.</p>
+        <article class="project-card">
+          <div class="media">
+            <img src="m10.jpg" alt="Yashwin Enchante" loading="lazy" />
+          </div>
+          <div class="info">
+            <h3>Yashwin Enchante</h3>
+            <p>Luxury 2 & 3 BHK homes focusing on lifestyle and leisure amenities.</p>
           </div>
         </article>
-        
+          </div> <!-- .slider-track -->
+        </div> <!-- .project-slider -->
+        <button class="slider-btn next" aria-label="Next project">▶</button>
       </div>
+      <div class="slider-dots" aria-hidden="false"></div>
     </section>
 
      <!-- ABOUT -->
@@ -191,10 +267,10 @@
               Interested Project
               <select name="project" id="project">
                 <option value="">-- Select --</option>
-                <option>VJ Palladio Baner NX</option>
-                <option>VJ PBC 2 (Balewadi)</option>
-                <option>VJ Indiworks (Kharadi)</option>
-                <option>VJ Yashwin Enchante</option>
+                <option>Palladio Baner NX</option>
+                <option>PBC 2 (Balewadi)</option>
+                <option>Indiworks (Kharadi)</option>
+                <option>Yashwin Enchante</option>
                 <option>General Enquiry</option>
               </select>
             </label>
@@ -239,11 +315,11 @@
 <footer class="site-footer">
   <div class="container footer-grid">
     <!-- Column 1: Logo + About -->
-    <div class="footer-col">
+      <div class="footer-col">
       <img src="logo.png.png" alt="logo" class="logo small" />
       <p>
-        At Vasundhara Developers by Meghraj pathade Consultant, we build modern, vastu-compliant homes with
-        premium finishes. Our promise is safe, stylish, and lasting living spaces.
+        At Vasundhara Developers by Meghraj Pathade Consultant, we build modern, vastu-compliant homes with
+        premium finishes. Our promise: safe, stylish, and lasting living spaces.
       </p>
     </div>
 
