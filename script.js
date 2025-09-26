@@ -71,26 +71,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Popup contact form logic (show once per visitor using localStorage)
+  // Popup contact form logic (show on every visit)
   const popup = document.getElementById('popupOverlay');
   const closeBtn = document.getElementById('popupClose');
   const popupForm = document.getElementById('popupForm');
   const popupFeedback = document.getElementById('popupFeedback');
-  const POPUP_KEY = 'vd_popup_shown';
   if (popup) {
-    const alreadyShown = window.localStorage && localStorage.getItem(POPUP_KEY);
-    // Show popup if not shown before
-    if (!alreadyShown) {
-      setTimeout(() => { popup.style.display = 'flex'; }, 800);
-    }
-
-    function markPopupShown() {
-      try { localStorage.setItem(POPUP_KEY, '1'); } catch (e) { /* ignore */ }
-    }
+    // Always show popup on page load/visit after a short delay
+    setTimeout(() => { popup.style.display = 'flex'; }, 800);
 
     // Close handlers
-    if (closeBtn) closeBtn.addEventListener('click', () => { popup.style.display = 'none'; markPopupShown(); });
-    popup.addEventListener('click', (e) => { if (e.target === popup) { popup.style.display = 'none'; markPopupShown(); } });
+    if (closeBtn) closeBtn.addEventListener('click', () => { popup.style.display = 'none'; });
+    popup.addEventListener('click', (e) => { if (e.target === popup) { popup.style.display = 'none'; } });
 
     if (popupForm) {
       popupForm.addEventListener('submit', function (e) {
@@ -100,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => {
           if (popupFeedback) popupFeedback.textContent = '✅ Thank you! We’ll contact you soon.';
           popupForm.reset();
-          markPopupShown();
           setTimeout(() => { popup.style.display = 'none'; }, 800);
         }, 900);
       });
@@ -143,6 +134,17 @@ document.addEventListener('DOMContentLoaded', function () {
     downloadBtn.addEventListener('click', (e) => { e.preventDefault(); openBrochureModal(); });
   }
 
+  // Project brochure buttons (open modal and pass filename)
+  let currentBrochureFile = 'bbc.pdf';
+  document.querySelectorAll('.project-brochure').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const f = btn.getAttribute('data-file');
+      if (f) currentBrochureFile = f;
+      openBrochureModal();
+    });
+  });
+
   // Offer buttons open the same brochure modal
   ['offerBrochure1','offerBrochure2','offerBrochure3'].forEach(id => {
     const btn = document.getElementById(id);
@@ -165,9 +167,9 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       if (bFeedback) { bFeedback.style.color = 'green'; bFeedback.textContent = 'Preparing your download...'; }
       setTimeout(() => {
-        const a = document.createElement('a');
-        a.href = 'bbc.pdf';
-        a.download = 'Vasundhara_Brochure.pdf';
+  const a = document.createElement('a');
+  a.href = currentBrochureFile || 'bbc.pdf';
+  a.download = 'Vasundhara_Brochure.pdf';
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -196,126 +198,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ===== Projects slider =====
-  (function initProjectsSlider(){
-    const sliderWrapper = document.querySelector('.project-slider-wrapper');
-    const track = document.querySelector('.slider-track');
-    if (!sliderWrapper || !track) return;
-
-    // ensure wrapper is focusable for keyboard nav
-    if (!sliderWrapper.hasAttribute('tabindex')) sliderWrapper.tabIndex = 0;
-
-    // collect only element children that look like project cards
-    const allItems = Array.from(track.children).filter(ch => ch.nodeType === 1 && ch.classList.contains('project-card'));
-    if (allItems.length === 0) return;
-
-    let items = allItems;
-    let itemsPerPage = 1;
-    let pageIndex = 0;
-    let pageCount = 1;
-    const prevBtn = sliderWrapper.querySelector('.slider-btn.prev');
-    const nextBtn = sliderWrapper.querySelector('.slider-btn.next');
-    let dotsContainer = document.querySelector('.slider-dots');
-    const AUTOPLAY_INTERVAL = 3600;
-    let autoplayTimer = null;
-
-    // helper: compute layout (itemsPerPage, pageCount, itemSize)
-    function computeLayout(){
-      const wrapperWidth = sliderWrapper.getBoundingClientRect().width;
-      // responsive items per page
-      if (wrapperWidth >= 1000) itemsPerPage = 3;
-      else if (wrapperWidth >= 700) itemsPerPage = 2;
-      else itemsPerPage = 1;
-
-      pageCount = Math.max(1, Math.ceil(items.length / itemsPerPage));
-      // ensure current pageIndex in bounds
-      pageIndex = Math.max(0, Math.min(pageIndex, pageCount - 1));
-      buildDots();
-      update();
-    }
-
-    function buildDots(){
-      // create container if missing
-      if (!dotsContainer) {
-        dotsContainer = document.createElement('div');
-        dotsContainer.className = 'slider-dots';
-        sliderWrapper.parentElement.insertAdjacentElement('beforeend', dotsContainer);
-      } else {
-        dotsContainer.innerHTML = '';
-      }
-
-      for (let i = 0; i < pageCount; i++){
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.setAttribute('aria-label', `Go to page ${i+1}`);
-        btn.addEventListener('click', () => { goToPage(i); resetAutoplay(); });
-        if (i === pageIndex) btn.classList.add('active');
-        dotsContainer.appendChild(btn);
-      }
-    }
-
-    function update(){
-      // calculate shift based on wrapper width so pages align cleanly
-      const gap = parseFloat(getComputedStyle(track).gap || 0);
-      const cardRect = items[0].getBoundingClientRect();
-      const cardWidth = cardRect.width;
-      // total width for one page (itemsPerPage cards + gaps)
-      const pageWidth = (cardWidth * itemsPerPage) + (gap * (itemsPerPage - 1));
-      const x = -(pageIndex * pageWidth);
-      track.style.transform = `translateX(${x}px)`;
-
-      // update active dot
-      const dots = dotsContainer ? Array.from(dotsContainer.children) : [];
-      dots.forEach((d, i) => d.classList.toggle('active', i === pageIndex));
-    }
-
-    function goToPage(i){
-      pageIndex = Math.max(0, Math.min(i, pageCount - 1));
-      update();
-    }
-
-    function nextPage(){ goToPage(pageIndex + 1 >= pageCount ? 0 : pageIndex + 1); }
-    function prevPage(){ goToPage(pageIndex - 1 < 0 ? pageCount - 1 : pageIndex - 1); }
-
-    if (prevBtn) prevBtn.addEventListener('click', () => { prevPage(); resetAutoplay(); });
-    if (nextBtn) nextBtn.addEventListener('click', () => { nextPage(); resetAutoplay(); });
-
-    // touch / pointer drag handling
-    let startX = 0, dx = 0, isDown = false;
-    track.addEventListener('pointerdown', (e) => { isDown = true; startX = e.clientX; track.style.transition = 'none'; track.setPointerCapture(e.pointerId); });
-    track.addEventListener('pointermove', (e) => { if (!isDown) return; dx = e.clientX - startX; });
-    track.addEventListener('pointerup', (e) => { if (!isDown) return; isDown = false; track.releasePointerCapture(e.pointerId); track.style.transition = ''; if (Math.abs(dx) > 60) { dx < 0 ? nextPage() : prevPage(); } dx = 0; resetAutoplay(); });
-    track.addEventListener('pointercancel', () => { isDown = false; dx = 0; });
-
-    // autoplay controls
-    function startAutoplay(){ stopAutoplay(); autoplayTimer = setInterval(nextPage, AUTOPLAY_INTERVAL); }
-    function stopAutoplay(){ if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; } }
-    function resetAutoplay(){ stopAutoplay(); startAutoplay(); }
-
-    // pause on hover / focus
-    sliderWrapper.addEventListener('mouseenter', stopAutoplay);
-    sliderWrapper.addEventListener('mouseleave', startAutoplay);
-    sliderWrapper.addEventListener('focusin', stopAutoplay);
-    sliderWrapper.addEventListener('focusout', startAutoplay);
-
-    // keyboard when wrapper focused
-    sliderWrapper.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') { prevPage(); resetAutoplay(); }
-      if (e.key === 'ArrowRight') { nextPage(); resetAutoplay(); }
-    });
-
-    // recalc on resize with debounce
-    let rTimer = null;
-    function onResize(){ if (rTimer) clearTimeout(rTimer); rTimer = setTimeout(() => { computeLayout(); }, 120); }
-    window.addEventListener('resize', onResize);
-
-    // initialize
-    computeLayout();
-    startAutoplay();
-
-    // if user navigates to a new page (visibility change), stop autoplay when hidden
-    document.addEventListener('visibilitychange', () => { if (document.hidden) stopAutoplay(); else startAutoplay(); });
-  })();
+  // Projects slider was removed — projects are shown as a static grid now.
 });
 
 
