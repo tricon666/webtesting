@@ -1,6 +1,70 @@
+/* Enhanced About Us Section */
+.about-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  align-items: center;
+}
+.about-img-side {
+  flex: 1 1 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.about-img-wrapper {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.about-img {
+  width: 260px;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 8px 32px rgba(49,163,245,0.12);
+  border: 6px solid var(--accent);
+}
+.about-img-decor {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 2px dashed var(--accent-2);
+  pointer-events: none;
+}
+.about-info-side {
+  flex: 2 1 400px;
+  min-width: 280px;
+}
+.about-info-side h2 {
+  margin-top: 0;
+}
+@media (max-width: 900px) {
+  .about-flex {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .about-img-wrapper {
+    width: 220px;
+    height: 220px;
+  }
+  .about-img {
+    width: 180px;
+    height: 180px;
+  }
+  .about-img-decor {
+    width: 200px;
+    height: 200px;
+  }
+}
 :root{
-  --accent:#1e88e5; /* slightly cooler blue accent */
-  --accent-2: #ef8b23; /* secondary warm accent */
+  --accent:#31a3f5; /* slightly cooler blue accent */
+  --accent-2: #31a3f5; /* secondary warm accent */
   --muted:#39424a;
   --bg:#fbfdff;
   --card:#ffffff;
@@ -133,7 +197,7 @@ body{
 
 /* Sections */
 .section{padding:20px 0 28px}
-.section.alt{background:linear-gradient(180deg,#f0deb2,#504c49); color:#fff}
+.section.alt{background:linear-gradient(180deg,#ffffff,#ffffff); color:#000000}
 .section h2{margin:0 0 8px;text-align:center}
 .section-sub{color:var(--muted);margin-bottom:18px;text-align:center}
 
@@ -388,7 +452,7 @@ body{
 .popup-box h2 {
   margin-bottom: 16px;
   text-align: center;
-  color: #e9900c;
+  color: #31a3f5;
 }
 
 .popup-form {
@@ -407,7 +471,7 @@ body{
 }
 
 .popup-form button {
-  background: #ea7f04;
+  background: #31a3f5;
   color: #fff;
   font-weight: bold;
   border: none;

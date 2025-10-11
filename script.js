@@ -1,9 +1,96 @@
+// UPDATED script.js — includes Google Sheets submission logic
 document.addEventListener('DOMContentLoaded', function () {
-  // Year
+  // ========== Brochure Modal Creation ========== 
+  // Helper to create and show the brochure modal
+  function showBrochureModal(pdfFile) {
+    // Remove any existing modal
+    const oldModal = document.getElementById('brochureModalOverlay');
+    if (oldModal) oldModal.remove();
+
+    // Modal HTML
+    const modal = document.createElement('div');
+    modal.id = 'brochureModalOverlay';
+    modal.className = 'modal-overlay';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+      <div class="popup-box">
+        <button class="popup-close" id="brochureModalClose" aria-label="Close">&times;</button>
+        <h2>Download Brochure</h2>
+        <form id="brochureForm" class="popup-form">
+          <input type="text" name="bname" id="bname" placeholder="Name" required />
+          <input type="email" name="bemail" id="bemail" placeholder="Email" required />
+          <input type="tel" name="bphone" id="bphone" placeholder="Phone" required />
+          <button type="submit">Download</button>
+        </form>
+        <p id="bFeedback" class="popup-feedback"></p>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Close logic
+    modal.querySelector('#brochureModalClose').onclick = () => modal.remove();
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+
+    // Attach form handler
+    const bf = modal.querySelector('#brochureForm');
+    const bfb = modal.querySelector('#bFeedback');
+    bf.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      if (bfb) bfb.textContent = '';
+      const nameEl = modal.querySelector('#bname');
+      const phoneEl = modal.querySelector('#bphone');
+      const emailEl = modal.querySelector('#bemail');
+      const err = validateFormFields(nameEl, phoneEl, emailEl);
+      if (err) { if (bfb) { bfb.style.color = 'crimson'; bfb.textContent = err; } return; }
+
+      if (bfb) { bfb.style.color = 'black'; bfb.textContent = 'Preparing download...'; }
+      // Use brochureScriptURL for brochure form
+      const result = await submitToSheet(bf, 'brochureForm', bfb, {
+        project: 'Brochure Request',
+        message: 'Requested brochure: ' + (pdfFile || 'unknown')
+      }, brochureScriptURL);
+      if (result.ok) {
+        // trigger download
+        const a = document.createElement('a');
+        a.href = pdfFile || 'bbc.pdf';
+        a.download = 'Brochure.pdf';
+        document.body.appendChild(a); a.click(); a.remove();
+        if (bfb) { bfb.style.color = 'green'; bfb.textContent = '✅ Download starting...'; }
+        setTimeout(() => { modal.remove(); }, 1200);
+      }
+    });
+  }
+  // ========== Brochure Download Button Logic ========== 
+  // For main hero button
+  const mainBrochureBtn = document.getElementById('downloadBrochure');
+  if (mainBrochureBtn) {
+    mainBrochureBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      showBrochureModal('bbc.pdf'); // Default main brochure
+    });
+  }
+  // For offer cards and project cards
+  document.querySelectorAll('button[id^="offerBrochure"], a.project-brochure').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      // For <a> tags, get data-file attribute
+      let file = btn.getAttribute('data-file') || 'bbc.pdf';
+      showBrochureModal(file);
+    });
+  });
+  // ========== CONFIG ========== 
+  // Main contact form Google Apps Script Web App URL
+  const scriptURL = "https://script.google.com/macros/s/AKfycbzTHRBoFCLU_m8QTS3is74kn45WsPPtZ8Ahf-LlTsVZWRx7UUhYCFk7HNEJ9pU7NIL1/exec";
+  // Popup form Google Apps Script Web App URL (replace with your own)
+  const popupScriptURL = "https://script.google.com/macros/s/AKfycbx8rJ-4fSZqLGdOr-WKDBXpzXht9oXGFVXf1_V8KzeEOC2915fyk9zYBrXvqlHikiQx/exec";
+  // Brochure form Google Apps Script Web App URL (replace with your own)
+  const brochureScriptURL = "https://script.google.com/macros/s/AKfycbygsQDql18Bqtcvfyfcg8IjdXKC482Jo_qhqXZR7GOkQAPYiRCmR1RpULbxc3nXf08Q/exec";
+
+  // ========== Year ==========
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  // Mobile nav toggle
+  // ========== Mobile nav toggle (existing) ==========
   const hamburger = document.getElementById('hamburger');
   const mobileNav = document.getElementById('mobileNav');
   if (hamburger && mobileNav) {
@@ -15,13 +102,10 @@ document.addEventListener('DOMContentLoaded', function () {
       mobileNav.setAttribute('aria-hidden', String(!mobileNav.classList.contains('active')));
     });
   }
-
-  // Close mobile nav when a link is clicked
   document.querySelectorAll('#mobileNav a').forEach(a => {
     a.addEventListener('click', () => {
       if (mobileNav && mobileNav.classList.contains('active')) {
-        mobileNav.classList.remove('active');
-        mobileNav.style.display = 'none';
+        mobileNav.classList.remove('active'); mobileNav.style.display = 'none';
         if (hamburger) hamburger.classList.remove('active');
         if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
         mobileNav.setAttribute('aria-hidden', 'true');
@@ -29,157 +113,231 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Simple field validator
+  // ========== Validation helper ==========
   function validateFormFields(nameEl, phoneEl, emailEl) {
-    const name = nameEl && nameEl.value ? nameEl.value.trim() : '';
-    const phone = phoneEl && phoneEl.value ? phoneEl.value.trim() : '';
-    const email = emailEl && emailEl.value ? emailEl.value.trim() : '';
-    if (!name) return 'Please enter your name.';
-    if (!phone || phone.length < 7) return 'Please enter a valid phone number.';
-    if (!email || !/.+@.+\..+/.test(email)) return 'Please enter a valid email address.';
-    return '';
+  const name = nameEl && nameEl.value ? nameEl.value.trim() : '';
+  const phone = phoneEl && phoneEl.value ? phoneEl.value.trim() : '';
+  const email = emailEl && emailEl.value ? emailEl.value.trim() : '';
+  if (!name) return 'Please enter your name.';
+  if (!phone || phone.length < 7) return 'Please enter a valid phone number.';
+  // Improved email validation: allow common cases, but don't block on minor format
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) return 'Please enter a valid email address.';
+  return '';
   }
 
-  // Lead form handling
+  // ========== Submit helper: sends FormData to Apps Script ==========
+  async function submitToSheet(formEl, sourceLabel = 'website', feedbackEl = null, extraData = {}, customURL) {
+    if (!formEl) return { ok: false, message: 'No form element' };
+
+    // Disable submit buttons inside the form
+    const submitButtons = formEl.querySelectorAll('[type="submit"]');
+    submitButtons.forEach(b => b.disabled = true);
+
+    // Build FormData and normalize names where helpful
+    const fd = new FormData(formEl);
+
+    // If brochure form uses bname/bphone/bemail, also append normalized keys
+    if (fd.has('bname') && !fd.has('name')) fd.append('name', fd.get('bname'));
+    if (fd.has('bphone') && !fd.has('phone')) fd.append('phone', fd.get('bphone'));
+    if (fd.has('bemail') && !fd.has('email')) fd.append('email', fd.get('bemail'));
+
+    // Ensure the source is set
+    fd.set('source', sourceLabel);
+
+    // Add any extra data (like file name of brochure)
+    Object.keys(extraData || {}).forEach(k => fd.set(k, extraData[k]));
+
+    // Use customURL if provided, otherwise default to scriptURL
+    const urlToUse = customURL || scriptURL;
+
+    try {
+      const res = await fetch(urlToUse, { method: 'POST', body: fd });
+      // Parse JSON if possible
+      let data = null;
+      try { data = await res.json(); } catch (err) { data = null; }
+
+      if (res.ok && (!data || data.result === 'success')) {
+        if (feedbackEl) { feedbackEl.style.color = 'green'; feedbackEl.textContent = '✅ Thank you! We received your details.'; }
+        formEl.reset();
+        submitButtons.forEach(b => b.disabled = false);
+        return { ok: true, data };
+      } else {
+        const msg = (data && data.message) ? data.message : `Submission failed (status ${res.status})`;
+        if (feedbackEl) { feedbackEl.style.color = 'crimson'; feedbackEl.textContent = '❌ ' + msg; }
+        submitButtons.forEach(b => b.disabled = false);
+        return { ok: false, message: msg };
+      }
+    } catch (err) {
+      console.error('submitToSheet error:', err);
+      if (feedbackEl) { feedbackEl.style.color = 'crimson'; feedbackEl.textContent = '❌ Submission failed. Please try again later.'; }
+      submitButtons.forEach(b => b.disabled = false);
+      return { ok: false, message: err.message || String(err) };
+    }
+  }
+
+  // ========== Lead form handling (main form) ==========
   const form = document.getElementById('leadForm');
   const feedback = document.getElementById('formFeedback');
   if (form) {
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
       if (!feedback) return;
       feedback.textContent = '';
+      // Validate using inputs in the form
       const err = validateFormFields(document.getElementById('name'), document.getElementById('phone'), document.getElementById('email'));
-      if (err) {
-        feedback.style.color = 'crimson';
-        feedback.textContent = err;
-        return;
+      if (err) { feedback.style.color = 'crimson'; feedback.textContent = err; return; }
+
+      feedback.style.color = 'black'; feedback.textContent = 'Submitting...';
+      // Send to Google Sheets
+      const result = await submitToSheet(form, 'leadForm', feedback);
+      if (result.ok) {
+        // success message already set by submitToSheet
       }
-      feedback.style.color = 'green';
-      feedback.textContent = 'Submitting...';
-      const payload = {
-        name: form.name.value.trim(),
-        phone: form.phone.value.trim(),
-        email: form.email.value.trim(),
-        project: form.project ? form.project.value : 'Not specified',
-        message: form.message ? form.message.value.trim() : ''
-      };
-      // simulate server
-      setTimeout(() => {
-        feedback.textContent = `Thanks ${payload.name}! We'll contact you soon at ${payload.phone}.`;
-        form.reset();
-      }, 900);
     });
   }
 
-  // Popup contact form logic (show on every visit)
+  // ========== Popup contact form ==========
   const popup = document.getElementById('popupOverlay');
   const closeBtn = document.getElementById('popupClose');
   const popupForm = document.getElementById('popupForm');
   const popupFeedback = document.getElementById('popupFeedback');
   if (popup) {
-    // Always show popup on page load/visit after a short delay
-    setTimeout(() => { popup.style.display = 'flex'; }, 800);
-
-    // Close handlers
+    setTimeout(() => { popup.style.display = 'flex'; }, 1000);
     if (closeBtn) closeBtn.addEventListener('click', () => { popup.style.display = 'none'; });
-    popup.addEventListener('click', (e) => { if (e.target === popup) { popup.style.display = 'none'; } });
+    popup.addEventListener('click', (e) => { if (e.target === popup) popup.style.display = 'none'; });
 
     if (popupForm) {
-      popupForm.addEventListener('submit', function (e) {
+      popupForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         if (popupFeedback) popupFeedback.textContent = 'Submitting...';
-        // Here you could send data to your server. We'll simulate and then close.
-        setTimeout(() => {
-          if (popupFeedback) popupFeedback.textContent = '✅ Thank you! We’ll contact you soon.';
-          popupForm.reset();
-          setTimeout(() => { popup.style.display = 'none'; }, 800);
-        }, 900);
+        let nameEl = popupForm.querySelector('#popup_name');
+        let emailEl = popupForm.querySelector('#popup_email');
+        let phoneEl = popupForm.querySelector('#popup_phone');
+        let messageEl = popupForm.querySelector('#popup_message');
+
+        // If still missing, show a clear error
+        if (!nameEl || !phoneEl || !emailEl) {
+          if (popupFeedback) {
+            popupFeedback.style.color = 'crimson';
+            popupFeedback.textContent = 'Form error: Could not find all input fields. Please check the form HTML.';
+          }
+          console.error('Popup form input fields missing:', { nameEl, emailEl, phoneEl });
+          return;
+        }
+
+        const err = validateFormFields(nameEl, phoneEl, emailEl);
+        if (err) {
+          if (popupFeedback) {
+            popupFeedback.style.color = 'crimson';
+            popupFeedback.textContent = err;
+          }
+          console.error('Popup form validation error:', err);
+          return;
+        }
+
+        // Build FormData manually for Google Sheet, send both normalized and variant field names
+        const fd = new FormData();
+        fd.append('name', nameEl.value.trim());
+        fd.append('popup_name', nameEl.value.trim());
+        fd.append('email', emailEl.value.trim());
+        fd.append('popup_email', emailEl.value.trim());
+        fd.append('phone', phoneEl.value.trim());
+        fd.append('popup_phone', phoneEl.value.trim());
+        fd.append('message', messageEl ? messageEl.value.trim() : '');
+        fd.append('popup_message', messageEl ? messageEl.value.trim() : '');
+        fd.append('source', 'popupForm');
+
+        // Disable submit button
+        const submitBtn = popupForm.querySelector('[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
+        try {
+          const res = await fetch(popupScriptURL, { method: 'POST', body: fd });
+          let data = null;
+          try { data = await res.json(); } catch (err) { data = null; }
+          if (res.ok && (!data || data.result === 'success')) {
+            if (popupFeedback) {
+              popupFeedback.style.color = 'green';
+              popupFeedback.textContent = 'Thank you for submitting!';
+            }
+            popupForm.reset();
+            if (submitBtn) submitBtn.disabled = false;
+            setTimeout(() => { popup.style.display = 'none'; }, 1200);
+          } else {
+            const msg = (data && data.message) ? data.message : `Submission failed (status ${res.status})`;
+            if (popupFeedback) {
+              popupFeedback.style.color = 'crimson';
+              popupFeedback.textContent = '❌ ' + msg;
+            }
+            console.error('Popup form submission error:', msg, res);
+            if (submitBtn) submitBtn.disabled = false;
+          }
+        } catch (err) {
+          if (popupFeedback) {
+            popupFeedback.style.color = 'crimson';
+            popupFeedback.textContent = '❌ Submission failed. Please try again later.';
+          }
+          console.error('Popup form fetch error:', err);
+          if (submitBtn) submitBtn.disabled = false;
+        }
       });
     }
   }
 
-  // ===== BROCHURE DOWNLOAD MODAL =====
-  const downloadBtn = document.getElementById('downloadBrochure');
-  const modalOverlay = document.createElement('div');
-  modalOverlay.className = 'modal-overlay';
-  modalOverlay.innerHTML = `
-    <div class="modal" role="dialog" aria-modal="true">
-      <h3>Download Brochure</h3>
-      <p>Before you download, please share your contact details so we can follow up.</p>
-      <form id="brochureForm">
-        <div class="row">
-          <input name="bname" id="bname" placeholder="Full name" required />
-          <input name="bphone" id="bphone" placeholder="Phone" required />
-        </div>
-        <div style="margin-top:10px">
-          <input name="bemail" id="bemail" placeholder="Email" required />
-        </div>
-        <div class="actions">
-          <button type="button" class="btn" id="bCancel">Cancel</button>
-          <button type="submit" class="btn primary" id="bSubmit">Download</button>
-        </div>
-        <p id="bFeedback" style="margin-top:8px;font-size:0.95rem"></p>
-      </form>
-    </div>`;
-  document.body.appendChild(modalOverlay);
+  // ========== Brochure modal (your existing dynamic modal) ==========
+  // The script you shared creates the modal overlay and the form with IDs: brochureForm, bname, bphone, bemail
+  // We'll hook into that form's submit event to send to Google Sheets, then trigger the download.
 
-  const brochureForm = document.getElementById('brochureForm');
-  const bCancel = document.getElementById('bCancel');
+  // Elements were dynamically created in your original code; re-query them now:
+  const brochureForm = document.getElementById('brochureForm'); // dynamically created
   const bFeedback = document.getElementById('bFeedback');
+  let currentBrochureFile = window.currentBrochureFile || 'bbc.pdf'; // fallback
 
-  function openBrochureModal() { modalOverlay.style.display = 'flex'; const el = document.getElementById('bname'); if (el) el.focus(); }
-  function closeBrochureModal() { modalOverlay.style.display = 'none'; if (bFeedback) bFeedback.textContent = ''; if (brochureForm) brochureForm.reset(); }
-
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', (e) => { e.preventDefault(); openBrochureModal(); });
-  }
-
-  // Project brochure buttons (open modal and pass filename)
-  let currentBrochureFile = 'bbc.pdf';
-  document.querySelectorAll('.project-brochure').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // If the brochure modal is created after DOMContentLoaded, the handlers above won't see it.
+  // So poll once to attach handler if it's added later:
+  function attachBrochureHandler() {
+    const bf = document.getElementById('brochureForm');
+    if (!bf) return;
+    const bfb = document.getElementById('bFeedback');
+    bf.addEventListener('submit', async function (e) {
       e.preventDefault();
-      const f = btn.getAttribute('data-file');
-      if (f) currentBrochureFile = f;
-      openBrochureModal();
-    });
-  });
-
-  // Offer buttons open the same brochure modal
-  ['offerBrochure1','offerBrochure2','offerBrochure3'].forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); openBrochureModal(); });
-  });
-
-  if (bCancel) bCancel.addEventListener('click', closeBrochureModal);
-
-  if (brochureForm) {
-    brochureForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (bFeedback) bFeedback.textContent = '';
+      if (bfb) bfb.textContent = '';
+      // Use bname, bphone, bemail for brochure form
       const nameEl = document.getElementById('bname');
       const phoneEl = document.getElementById('bphone');
       const emailEl = document.getElementById('bemail');
       const err = validateFormFields(nameEl, phoneEl, emailEl);
-      if (err) {
-        if (bFeedback) { bFeedback.style.color = 'crimson'; bFeedback.textContent = err; }
-        return;
+      if (err) { if (bfb) { bfb.style.color = 'crimson'; bfb.textContent = err; } return; }
+
+      if (bfb) { bfb.style.color = 'black'; bfb.textContent = 'Preparing download...'; }
+      // Use brochureScriptURL for brochure form
+      const result = await submitToSheet(bf, 'brochureForm', bfb, {
+        project: 'Brochure Request',
+        message: 'Requested brochure: ' + (currentBrochureFile || 'unknown')
+      }, brochureScriptURL);
+      if (result.ok) {
+        // trigger download
+        const a = document.createElement('a');
+        a.href = currentBrochureFile || 'bbc.pdf';
+        a.download = 'Brochure.pdf';
+        document.body.appendChild(a); a.click(); a.remove();
+        // close modal after a short delay
+        setTimeout(() => {
+          const modalOverlay = document.querySelector('.modal-overlay');
+          if (modalOverlay) modalOverlay.style.display = 'none';
+          if (bfb) bfb.textContent = '';
+          bf.reset();
+        }, 1100);
       }
-      if (bFeedback) { bFeedback.style.color = 'green'; bFeedback.textContent = 'Preparing your download...'; }
-      setTimeout(() => {
-  const a = document.createElement('a');
-  a.href = currentBrochureFile || 'bbc.pdf';
-  a.download = 'Vasundhara_Brochure.pdf';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        if (bFeedback) bFeedback.textContent = 'Download started. Thank you!';
-        setTimeout(closeBrochureModal, 1200);
-      }, 800);
     });
   }
 
-  // Menu-toggle button (PNG icons) — keep in sync with hamburger for users using the image button
+  // Attempt attach now and again later (in case modal is injected dynamically)
+  attachBrochureHandler();
+  setTimeout(attachBrochureHandler, 600);
+  setTimeout(attachBrochureHandler, 1500);
+
+  // ========== Menu-toggle PNG (if present) - keep in sync ==========
   const menuToggle = document.getElementById('menuToggle');
   const iconHamburger = document.getElementById('iconHamburger');
   const iconClose = document.getElementById('iconClose');
@@ -189,19 +347,14 @@ document.addEventListener('DOMContentLoaded', function () {
       const isOpen = mobileNav.classList.toggle('active');
       mobileNav.style.display = isOpen ? 'flex' : 'none';
       mobileNav.setAttribute('aria-hidden', String(!isOpen));
-      // toggle visual hamburger state
       if (hamburger) hamburger.classList.toggle('active', isOpen);
       if (hamburger) hamburger.setAttribute('aria-expanded', String(isOpen));
-      // swap icons
       if (iconHamburger) iconHamburger.style.display = isOpen ? 'none' : '';
       if (iconClose) iconClose.style.display = isOpen ? '' : 'none';
     });
   }
 
-  // Projects slider was removed — projects are shown as a static grid now.
+  // Done DOMContentLoaded
 });
-
-
-
 
 
