@@ -82,9 +82,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Main contact form Google Apps Script Web App URL
   const scriptURL = "https://script.google.com/macros/s/AKfycbzTHRBoFCLU_m8QTS3is74kn45WsPPtZ8Ahf-LlTsVZWRx7UUhYCFk7HNEJ9pU7NIL1/exec";
   // Popup form Google Apps Script Web App URL (replace with your own)
-  const popupScriptURL = "https://script.google.com/macros/s/AKfycbx8rJ-4fSZqLGdOr-WKDBXpzXht9oXGFVXf1_V8KzeEOC2915fyk9zYBrXvqlHikiQx/exec";
+  const popupScriptURL = "https://script.google.com/macros/s/AKfycbw-7-ahgizClgn39cH33AqOFlpHIcz9cl_mqpUi240RxgJnbXsysnV144hXB-mFyv_B/exec";
   // Brochure form Google Apps Script Web App URL (replace with your own)
-  const brochureScriptURL = "https://script.google.com/macros/s/AKfycbygsQDql18Bqtcvfyfcg8IjdXKC482Jo_qhqXZR7GOkQAPYiRCmR1RpULbxc3nXf08Q/exec";
+  const brochureScriptURL = "https://script.google.com/macros/s/AKfycbwnYKgIADwIW0gDKaUm5WgKdUqB5lCzJs6ONIP6oaOmAJG22TdgyoxdtR5sGGb5vCo/exec";
 
   // ========== Year ==========
   const yearEl = document.getElementById('year');
@@ -358,3 +358,16 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+const popupScriptURL = "https://script.google.com/macros/s/AKfycbw-7-ahgizClgn39cH33AqOFlpHIcz9cl_mqpUi240RxgJnbXsysnV144hXB-mFyv_B/exec"; // replace
+
+const fd = new FormData();
+fd.append('name', nameValue);
+fd.append('phone', phoneValue);
+fd.append('email', emailValue);
+fd.append('message', messageValue);
+fd.append('source', 'popupForm');
+
+fetch(popupScriptURL, { method: 'POST', body: fd })
+  .then(r => r.json())
+  .then(j => console.log(j))
+  .catch(err => console.error(err));
