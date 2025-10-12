@@ -358,16 +358,35 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-const popupScriptURL = "https://script.google.com/macros/s/AKfycbw-7-ahgizClgn39cH33AqOFlpHIcz9cl_mqpUi240RxgJnbXsysnV144hXB-mFyv_B/exec"; // replace
+// ===== Banner auto-scroll (simple) =====
+document.addEventListener('DOMContentLoaded', function () {
+  const track = document.querySelector('.banner-track');
+  if (!track) return;
+  let autoTimer = null;
+  const slides = Array.from(track.children);
+  let idx = 0;
 
-const fd = new FormData();
-fd.append('name', nameValue);
-fd.append('phone', phoneValue);
-fd.append('email', emailValue);
-fd.append('message', messageValue);
-fd.append('source', 'popupForm');
+  function goTo(i){
+    idx = (i + slides.length) % slides.length;
+    const slide = slides[idx];
+    // compute target scrollLeft relative to the track (robust to gaps/padding)
+    const trackRect = track.getBoundingClientRect();
+    const slideRect = slide.getBoundingClientRect();
+    const left = (slideRect.left - trackRect.left) + track.scrollLeft;
+    track.scrollTo({ left, behavior: 'smooth' });
+  }
 
-fetch(popupScriptURL, { method: 'POST', body: fd })
-  .then(r => r.json())
-  .then(j => console.log(j))
-  .catch(err => console.error(err));
+  function startAuto(){ autoTimer = setInterval(()=> goTo(idx+1), 4000); }
+  function stopAuto(){ if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+
+  track.addEventListener('mouseenter', stopAuto);
+  track.addEventListener('focusin', stopAuto);
+  track.addEventListener('mouseleave', startAuto);
+  track.addEventListener('focusout', startAuto);
+
+  // Recompute slides on resize (in case images change layout)
+  window.addEventListener('resize', () => { /* no-op: goTo will compute geometry on each call */ });
+
+  // Start
+  startAuto();
+});
