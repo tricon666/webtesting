@@ -514,11 +514,13 @@ p{
 .footer-col nav a:hover {
   color: var(--accent);
 }
-.banner-section > .container{ max-width: 100%; width: 100%; padding-left: 0; padding-right: 0; }
-.banner-carousel{position:relative;overflow:visible;border-radius:0}
+.banner-section{background:#ffffff}
+.banner-section{padding:0}
+.banner-section > .container{ max-width: 100%; width: 100%; padding: 0; }
+.banner-carousel{position:relative;overflow:visible;border-radius:0;background:#ffffff}
 .banner-track{display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;width:100%;scrollbar-width:none;-ms-overflow-style:none}
 .banner-track::-webkit-scrollbar{display:none}
-.banner-slide{flex:0 0 100%;position:relative;scroll-snap-align:center;touch-action:pan-x}
+.banner-slide{flex:0 0 100%;position:relative;scroll-snap-align:center;touch-action:pan-x;background:#ffffff}
 .banner-slide img{width:100%;height:360px;object-fit:contain;object-position:center;display:block;border-radius:0}
 .banner-caption{position:absolute;bottom:20px;left:48px;color:#fff;text-shadow:0 6px 18px rgba(0,0,0,0.8);z-index:3;max-width:calc(100% - 96px)}
 .banner-caption.center{left:50%;transform:translateX(-50%);text-align:center}
