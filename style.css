@@ -516,20 +516,115 @@ p{
 }
 .banner-section > .container{ max-width: 100%; width: 100%; padding-left: 0; padding-right: 0; }
 .banner-carousel{position:relative;overflow:visible;border-radius:0}
-.banner-track{display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;width:100%}
-.banner-slide{flex:0 0 100%;position:relative;min-height:220px;scroll-snap-align:center}
-.banner-slide img{width:100%;height:360px;object-fit:cover;display:block;border-radius:0}
-.banner-caption{position:absolute;left:48px;bottom:40px;color:#fff;text-shadow:0 6px 18px rgba(0,0,0,0.45);z-index:2}
-.banner-caption strong{display:block;font-size:1.5rem}
+.banner-track{display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;width:100%;scrollbar-width:none;-ms-overflow-style:none}
+.banner-track::-webkit-scrollbar{display:none}
+.banner-slide{flex:0 0 100%;position:relative;scroll-snap-align:center;touch-action:pan-x}
+.banner-slide img{width:100%;height:360px;object-fit:contain;object-position:center;display:block;border-radius:0}
+.banner-caption{position:absolute;bottom:20px;left:48px;color:#fff;text-shadow:0 6px 18px rgba(0,0,0,0.8);z-index:3;max-width:calc(100% - 96px)}
+.banner-caption.center{left:50%;transform:translateX(-50%);text-align:center}
+.banner-caption.inside{top:20px;bottom:auto;left:50%;transform:translateX(-50%);text-align:center}
+.banner-caption strong{display:block;font-size:1.5rem;margin-bottom:4px}
+.banner-caption p{margin:0;font-size:1rem;opacity:0.95}
 
-@media (max-width:640px){
-  .banner-slide img{height:180px}
-  .banner-caption{left:12px;bottom:16px}
+/* Tablet specific styles */
+@media (max-width:1024px) and (min-width:641px){
+  .banner-slide img{height:320px;object-fit:contain}
+  .banner-caption{left:32px;bottom:16px;max-width:calc(100% - 64px)}
+  .banner-caption strong{font-size:1.4rem}
+  .banner-caption p{font-size:0.95rem}
 }
 
+/* Mobile styles - improved visibility */
+@media (max-width:640px){
+  .banner-slide img{height:280px;object-fit:contain}
+  .banner-caption{left:16px;bottom:12px;max-width:calc(100% - 32px)}
+  .banner-caption strong{font-size:1.1rem}
+  .banner-caption p{font-size:0.85rem}
+}
+
+/* Large desktop */
 @media (min-width:1200px){
-  /* slightly taller hero banners for wide screens */
   .banner-slide img{height:420px}
+}
+
+/* Banner navigation dots */
+.banner-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.banner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.banner-dot:hover {
+  background: rgba(255,255,255,0.8);
+  transform: scale(1.2);
+}
+
+.banner-dot.active {
+  background: rgba(255,255,255,0.9);
+}
+
+/* Banner section improvements */
+.banner-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ensure banner is properly visible on all devices */
+.banner-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Add subtle overlay for better text readability */
+.banner-slide::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+
+
+/* Mobile banner dots adjustment */
+@media (max-width:640px){
+  .banner-dots {
+    bottom: 4px;
+    gap: 6px;
+  }
+  
+  .banner-dot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Banner loading state */
+.banner-slide img {
+  transition: opacity 0.3s ease;
+}
+
+.banner-slide img[data-loading="true"] {
+  opacity: 0.7;
 }
 
 .social-links {

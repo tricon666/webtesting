@@ -90,6 +90,29 @@ document.addEventListener('DOMContentLoaded', function () {
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  // ========== Banner Image Loading Optimization ==========
+  // Ensure banner images load properly on all devices
+  const bannerImages = document.querySelectorAll('.banner-slide img');
+  bannerImages.forEach(img => {
+    // Add loading optimization
+    img.style.transition = 'opacity 0.3s ease';
+    img.style.opacity = '0';
+    
+    const handleImageLoad = () => {
+      img.style.opacity = '1';
+    };
+    
+    if (img.complete) {
+      handleImageLoad();
+    } else {
+      img.addEventListener('load', handleImageLoad);
+      img.addEventListener('error', () => {
+        console.warn('Banner image failed to load:', img.src);
+        img.style.opacity = '1'; // Show anyway to prevent blank space
+      });
+    }
+  });
+
   // ========== Mobile nav toggle (existing) ==========
   const hamburger = document.getElementById('hamburger');
   const mobileNav = document.getElementById('mobileNav');
@@ -354,17 +377,81 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // ===== Banner Navigation Indicators (optional) =====
+  const bannerSection = document.querySelector('.banner-section');
+  const bannerTrack = document.querySelector('.banner-track');
+  if (bannerSection && bannerTrack) {
+    const slides = bannerTrack.querySelectorAll('.banner-slide');
+    if (slides.length > 1) {
+      // Create navigation dots
+      const dotsContainer = document.createElement('div');
+      dotsContainer.className = 'banner-dots';
+      dotsContainer.style.cssText = `
+        position: absolute;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+      `;
+      
+      slides.forEach((_, index) => {
+        const dot = document.createElement('button');
+        dot.className = 'banner-dot';
+        dot.style.cssText = `
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          border: none;
+          background: rgba(255,255,255,0.5);
+          cursor: pointer;
+          transition: background 0.3s ease;
+        `;
+        dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+        
+        dot.addEventListener('click', () => {
+          const track = document.querySelector('.banner-track');
+          if (track) {
+            const slideWidth = track.offsetWidth;
+            track.scrollTo({ left: slideWidth * index, behavior: 'smooth' });
+          }
+        });
+        
+        dotsContainer.appendChild(dot);
+      });
+      
+      bannerSection.style.position = 'relative';
+      bannerSection.appendChild(dotsContainer);
+      
+      // Update active dot on scroll
+      bannerTrack.addEventListener('scroll', () => {
+        const scrollLeft = bannerTrack.scrollLeft;
+        const slideWidth = bannerTrack.offsetWidth;
+        const activeIndex = Math.round(scrollLeft / slideWidth);
+        
+        dotsContainer.querySelectorAll('.banner-dot').forEach((dot, index) => {
+          dot.style.background = index === activeIndex ? 
+            'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)';
+        });
+      }, { passive: true });
+    }
+  }
+
   // Done DOMContentLoaded
 });
 
 
-// ===== Banner auto-scroll (simple) =====
+// ===== Banner auto-scroll with touch support =====
 document.addEventListener('DOMContentLoaded', function () {
   const track = document.querySelector('.banner-track');
   if (!track) return;
   let autoTimer = null;
   const slides = Array.from(track.children);
   let idx = 0;
+  let isUserInteracting = false;
+  let touchStartX = 0;
+  let touchStartTime = 0;
 
   function goTo(i){
     idx = (i + slides.length) % slides.length;
@@ -376,17 +463,95 @@ document.addEventListener('DOMContentLoaded', function () {
     track.scrollTo({ left, behavior: 'smooth' });
   }
 
-  function startAuto(){ autoTimer = setInterval(()=> goTo(idx+1), 4000); }
-  function stopAuto(){ if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+  function startAuto(){ 
+    if (!isUserInteracting) {
+      autoTimer = setInterval(()=> goTo(idx+1), 8000); 
+    }
+  }
+  function stopAuto(){ 
+    if (autoTimer) { 
+      clearInterval(autoTimer); 
+      autoTimer = null; 
+    } 
+  }
 
-  track.addEventListener('mouseenter', stopAuto);
-  track.addEventListener('focusin', stopAuto);
-  track.addEventListener('mouseleave', startAuto);
-  track.addEventListener('focusout', startAuto);
+  // Mouse events
+  track.addEventListener('mouseenter', () => {
+    isUserInteracting = true;
+    stopAuto();
+  });
+  track.addEventListener('mouseleave', () => {
+    isUserInteracting = false;
+    setTimeout(startAuto, 1000);
+  });
 
-  // Recompute slides on resize (in case images change layout)
-  window.addEventListener('resize', () => { /* no-op: goTo will compute geometry on each call */ });
+  // Touch events for mobile/tablet
+  track.addEventListener('touchstart', (e) => {
+    isUserInteracting = true;
+    stopAuto();
+    touchStartX = e.touches[0].clientX;
+    touchStartTime = Date.now();
+  }, { passive: true });
 
-  // Start
+  track.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndTime = Date.now();
+    const deltaX = touchStartX - touchEndX;
+    const deltaTime = touchEndTime - touchStartTime;
+    
+    // Detect swipe gesture (minimum distance and maximum time)
+    if (Math.abs(deltaX) > 50 && deltaTime < 300) {
+      if (deltaX > 0) {
+        // Swipe left - next slide
+        goTo(idx + 1);
+      } else {
+        // Swipe right - previous slide
+        goTo(idx - 1);
+      }
+    }
+    
+    // Resume auto-scroll after user interaction
+    setTimeout(() => {
+      isUserInteracting = false;
+      startAuto();
+    }, 3000);
+  }, { passive: true });
+
+  // Scroll event to update current slide index
+  track.addEventListener('scroll', () => {
+    const scrollLeft = track.scrollLeft;
+    const slideWidth = track.offsetWidth;
+    const newIdx = Math.round(scrollLeft / slideWidth);
+    if (newIdx !== idx && newIdx >= 0 && newIdx < slides.length) {
+      idx = newIdx;
+    }
+  }, { passive: true });
+
+  // Focus events
+  track.addEventListener('focusin', () => {
+    isUserInteracting = true;
+    stopAuto();
+  });
+  track.addEventListener('focusout', () => {
+    isUserInteracting = false;
+    setTimeout(startAuto, 1000);
+  });
+
+  // Pause on visibility change (when tab is not active)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopAuto();
+    } else if (!isUserInteracting) {
+      setTimeout(startAuto, 1000);
+    }
+  });
+
+  // Recompute slides on resize
+  window.addEventListener('resize', () => {
+    // Reset to current slide position after resize
+    setTimeout(() => goTo(idx), 100);
+  });
+
+  // Start auto-scroll
   startAuto();
 });
