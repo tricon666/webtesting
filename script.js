@@ -219,6 +219,205 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // ========== Customer Feedback Form ==========
+  (function initFeedbackForm() {
+    const fbForm = document.getElementById('feedbackForm');
+    const fbList = document.getElementById('feedbackList');
+    const fbFeedback = document.getElementById('feedbackFormFeedback');
+    const ratingInput = document.getElementById('rating');
+    const ratingStars = document.getElementById('ratingStars');
+
+    if (!fbForm) return;
+
+    // Build 5-star rating UI (accessible radio-like buttons)
+    function buildStars(initial = 5) {
+      ratingStars.innerHTML = '';
+      for (let i = 5; i >= 1; i--) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'star';
+        btn.setAttribute('data-value', String(i));
+        btn.setAttribute('aria-label', `${i} star${i > 1 ? 's' : ''}`);
+        btn.setAttribute('role', 'radio');
+        btn.setAttribute('aria-checked', String(i === initial));
+        btn.innerHTML = '★';
+        btn.style.cssText = 'font-size:24px;background:none;border:none;cursor:pointer;color:#ffd055;padding:2px;';
+        btn.addEventListener('click', () => {
+          ratingInput.value = String(i);
+          updateStars(i);
+        });
+        ratingStars.appendChild(btn);
+      }
+      updateStars(initial);
+    }
+
+    function updateStars(value) {
+      Array.from(ratingStars.children).forEach((el) => {
+        const v = Number(el.getAttribute('data-value'));
+        el.setAttribute('aria-checked', String(v === Number(value)));
+        el.style.opacity = v <= Number(value) ? '1' : '0.45';
+      });
+    }
+
+    buildStars(Number(ratingInput ? ratingInput.value : 5));
+
+    // --- UX improvements: char counter and submit enable/disable ---
+    const charCountEl = document.getElementById('charCount');
+    const submitButton = fbForm.querySelector('[type="submit"]');
+
+    function updateSubmitState() {
+      const nameFilled = !!(document.getElementById('fb_name') && document.getElementById('fb_name').value.trim());
+      const reviewFilled = !!(document.getElementById('fb_review') && document.getElementById('fb_review').value.trim());
+      if (submitButton) submitButton.disabled = !(nameFilled && reviewFilled);
+    }
+
+    if (charCountEl) {
+      const reviewEl = document.getElementById('fb_review');
+      const update = () => { if (charCountEl && reviewEl) charCountEl.textContent = `${reviewEl.value.length}/500`; };
+      if (reviewEl) {
+        reviewEl.addEventListener('input', () => { update(); updateSubmitState(); });
+        update();
+      }
+    }
+
+    // show placeholder if no feedback yet
+    const fbListPlaceholderId = 'feedbackPlaceholder';
+    function ensurePlaceholder() {
+      const list = document.getElementById('feedbackList');
+      if (!list) return;
+      if (!list.firstElementChild) {
+        const ph = document.createElement('div');
+        ph.id = fbListPlaceholderId;
+        ph.style.cssText = 'padding:18px;border-radius:12px;background:#fff;text-align:center;color:#90a4ae;border:1px dashed #e6eef5';
+        ph.textContent = 'No feedback yet — be the first to share your experience.';
+        list.appendChild(ph);
+      } else {
+        const existing = document.getElementById(fbListPlaceholderId);
+        if (existing) existing.remove();
+      }
+    }
+
+    ensurePlaceholder();
+
+    // Render a feedback item in the list
+    function renderFeedbackItem(item) {
+      const wrap = document.createElement('article');
+      wrap.className = 'feedback-item animate-in';
+
+
+
+      let name = (item.name || '').trim();
+      const rating = Number(item.rating) || 5;
+      let review = item.review || '';
+
+      // If name missing, try to derive from email (local-part), otherwise fall back to 'Guest'
+      if (!name) {
+        if (item.email && String(item.email).includes('@')) {
+          name = String(item.email).split('@')[0].replace(/[._\-]/g, ' ');
+        } else {
+          name = 'Guest';
+        }
+      }
+
+      // build initials for avatar (first two letters of words)
+      const initials = String(name).trim().split(/\s+/).map(s => s[0] || '').slice(0,2).join('').toUpperCase() || 'G';
+
+      // build star string (max 5)
+      const stars = '★'.repeat(Math.max(1, Math.min(5, rating)));
+
+      wrap.innerHTML = `
+        <div class="avatar" aria-hidden="true">${escapeHtml(initials)}</div>
+        <div class="meta">
+          <div class="head">
+            <div class="name">${escapeHtml(name)}</div>
+            <div class="stars" aria-hidden="true">${stars}</div>
+          </div>
+          <div class="review">${escapeHtml(review)}</div>
+        </div>
+      `;
+
+  // prepend new item and remove placeholder if present
+  const placeholder = document.getElementById('feedbackPlaceholder');
+  if (placeholder) placeholder.remove();
+  // clamp review length for display
+  if (review.length > 1000) review = review.slice(0, 1000) + '...';
+  fbList.insertBefore(wrap, fbList.firstChild);
+
+      // remove animation class after it finishes to keep DOM clean
+      setTimeout(() => { wrap.classList.remove('animate-in'); }, 900);
+    }
+
+    // Basic HTML escape to avoid injection when rendering locally
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Feedback form submit handler
+    fbForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      if (fbFeedback) { fbFeedback.textContent = ''; }
+
+      const nameEl = document.getElementById('fb_name');
+      const emailEl = document.getElementById('fb_email');
+      const reviewEl = document.getElementById('fb_review');
+      const ratingVal = Number(document.getElementById('rating').value || 5);
+
+      // Minimal validation
+      if (!nameEl || !reviewEl) {
+        if (fbFeedback) { fbFeedback.style.color = 'crimson'; fbFeedback.textContent = 'Form error. Please reload the page.'; }
+        return;
+      }
+      if (!nameEl.value.trim()) {
+        if (fbFeedback) { fbFeedback.style.color = 'crimson'; fbFeedback.textContent = 'Please enter your name.'; }
+        return;
+      }
+      if (!reviewEl.value.trim()) {
+        if (fbFeedback) { fbFeedback.style.color = 'crimson'; fbFeedback.textContent = 'Please write a short review.'; }
+        return;
+      }
+
+      if (fbFeedback) { fbFeedback.style.color = 'black'; fbFeedback.textContent = 'Submitting...'; }
+
+
+      
+  // form fields are present on the form element (name, email, rating, review)
+  // submitToSheet will build FormData from the form, so no manual FormData needed here.
+
+      // Disable submit button
+      const submitBtn = fbForm.querySelector('[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const result = await submitToSheet(fbForm, 'feedbackForm', fbFeedback, {
+          project: 'Website Feedback',
+          message: reviewEl.value.trim()
+        });
+
+        if (result.ok) {
+          // Render locally
+          renderFeedbackItem({ name: nameEl.value.trim(), rating: ratingVal, review: reviewEl.value.trim() });
+          if (fbFeedback) { fbFeedback.style.color = 'green'; fbFeedback.textContent = 'Thank you for your feedback!'; }
+          fbForm.reset();
+          // reset stars to 5
+          ratingInput.value = '5';
+          buildStars(5);
+        }
+      } catch (err) {
+        console.error('Feedback submit error', err);
+        if (fbFeedback) { fbFeedback.style.color = 'crimson'; fbFeedback.textContent = 'Submission failed. Please try again later.'; }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+
+  })();
+
   // ========== Popup contact form ==========
   const popup = document.getElementById('popupOverlay');
   const closeBtn = document.getElementById('popupClose');
